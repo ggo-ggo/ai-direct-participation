@@ -1322,9 +1322,12 @@ function NewDiagram() {
           <text x={cx} y={cy+12} textAnchor="middle" fill="rgba(255,106,26,.7)" fontSize="9" fontFamily="JetBrains Mono">BUDGET POOL</text>
 
           {/* Connections between peers and center, and peer-to-peer */}
-          {peers.map((p, i) => (
+          {peers.map((p, i) => {
+            const dx=p.x-cx, dy=p.y-cy, L=Math.hypot(dx,dy)||1, ux=dx/L, uy=dy/L;
+            const sx=cx+ux*40, sy=cy+uy*40, ex=p.x-ux*14, ey=p.y-uy*14;
+            return (
             <g key={i}>
-              <line x1={p.x} y1={p.y} x2={cx} y2={cy}
+              <line x1={sx} y1={sy} x2={ex} y2={ey}
                 stroke="rgba(255,106,26,.35)" strokeWidth="1" strokeDasharray="3 3"/>
               {/* peer-to-peer for some */}
               {i % 2 === 0 && (
@@ -1332,7 +1335,8 @@ function NewDiagram() {
                   stroke="rgba(245,241,232,.15)" strokeWidth=".8"/>
               )}
             </g>
-          ))}
+            );
+          })}
 
           {/* Animated traveling dots along radial lines */}
           {peers.map((p, i) => (
@@ -1596,7 +1600,15 @@ function PillarScene({scene}){
   if (scene === "loop"){
     return (
       <svg viewBox={vb} style={{width:"100%", height:"auto"}}>
-        <circle cx="180" cy="160" r="110" fill="none" stroke="rgba(255,106,26,.4)" strokeWidth="1.4" strokeDasharray="4 5"/>
+        {(() => {
+          const cx=180, cy=160, R=110, g=0.27;
+          const ang = k => (k/4)*Math.PI*2 - Math.PI/2;
+          const pt = a => [cx+Math.cos(a)*R, cy+Math.sin(a)*R];
+          return [0,1,2,3].map(k => {
+            const [x0,y0]=pt(ang(k)+g), [x1,y1]=pt(ang(k+1)-g);
+            return <path key={"ring"+k} d={`M ${x0} ${y0} A ${R} ${R} 0 0 1 ${x1} ${y1}`} fill="none" stroke="rgba(255,106,26,.4)" strokeWidth="1.4" strokeDasharray="4 5"/>;
+          });
+        })()}
         {["청년","상점","주민","사업"].map((label, idx) => {
           const a = (idx/4)*Math.PI*2 - Math.PI/2;
           const x = 180 + Math.cos(a)*110, y = 160 + Math.sin(a)*110;
@@ -1958,10 +1970,12 @@ function SceneSVG({stage}){
           const a = (i/10)*Math.PI*2;
           const r = 110;
           const x = 160 + Math.cos(a)*r, y = 160 + Math.sin(a)*r;
+          const lx = Math.cos(a), ly = Math.sin(a);
+          const tEdge = Math.min(Math.abs(lx)>1e-3?60/Math.abs(lx):1e9, Math.abs(ly)>1e-3?40/Math.abs(ly):1e9) + 6;
           return (
             <g key={i}>
               <circle cx={x} cy={y} r="6" fill="none" stroke="rgba(255,106,26,.6)" strokeWidth="1.2"/>
-              <line x1={x} y1={y} x2={160} y2={160} stroke="rgba(255,106,26,.25)" strokeDasharray="2 3"/>
+              <line x1={x-lx*12} y1={y-ly*12} x2={160+lx*tEdge} y2={160+ly*tEdge} stroke="rgba(255,106,26,.25)" strokeDasharray="2 3"/>
               <circle r="2" fill="#ff6a1a">
                 <animate attributeName="cx" values={`${x};160`} dur={`${1.6+(i%3)*0.4}s`} repeatCount="indefinite" begin={`${i*0.2}s`}/>
                 <animate attributeName="cy" values={`${y};160`} dur={`${1.6+(i%3)*0.4}s`} repeatCount="indefinite" begin={`${i*0.2}s`}/>
@@ -2005,7 +2019,15 @@ function SceneSVG({stage}){
     // local currency loop
     return (
       <svg {...common}>
-        <circle cx="160" cy="160" r="100" fill="none" stroke="rgba(255,106,26,.4)" strokeWidth="1.4" strokeDasharray="4 5"/>
+        {(() => {
+          const cx=160, cy=160, R=100, g=0.30;
+          const ang = k => (k/4)*Math.PI*2 - Math.PI/2;
+          const pt = a => [cx+Math.cos(a)*R, cy+Math.sin(a)*R];
+          return [0,1,2,3].map(k => {
+            const [x0,y0]=pt(ang(k)+g), [x1,y1]=pt(ang(k+1)-g);
+            return <path key={"ring"+k} d={`M ${x0} ${y0} A ${R} ${R} 0 0 1 ${x1} ${y1}`} fill="none" stroke="rgba(255,106,26,.4)" strokeWidth="1.4" strokeDasharray="4 5"/>;
+          });
+        })()}
 
         {["청년","상점","주민","사업"].map((label, i) => {
           const a = (i/4)*Math.PI*2 - Math.PI/2;
