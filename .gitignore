@@ -1,1 +1,32 @@
+# --- Vibisual IDE ---
 .vibisual/
+.vibisual*
+**/.vibisual/
+
+# --- Claude / Claude Code / AI 에이전트 ---
+.claude/
+.claude*
+**/.claude/
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+.anthropic/
+memory/
+.mcp.json
+
+# --- 기타 AI 도구 ---
+.cursor/
+.cursorrules
+.aider*
+.windsurf/
+.github-copilot/
+
+# --- 시스템/에디터 ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+node_modules/
+.env
+.env.*
